@@ -23,6 +23,15 @@ type BBCode struct {
 	IsValid       bool
 }
 
+var validCodes map[string]bool = map[string]bool{
+	"b":     true,
+	"i":     true,
+	"u":     true,
+	"user":  true,
+	"code":  true,
+	"quote": true,
+}
+
 // Parse string for valid BBCode and return list of parsed values and newstring
 func Parse(s string) (b BBCodes) {
 	var tag BBCode
@@ -70,8 +79,8 @@ func Parse(s string) (b BBCodes) {
 			for j := i; j < len(b.BBCodes); j++ {
 				if strings.ToLower(b.BBCodes[i].Name) == strings.ToLower(b.BBCodes[j].Name) &&
 					b.BBCodes[j].IsClose {
-					b.BBCodes[i].IsValid = true
-					b.BBCodes[j].IsValid = true
+					b.BBCodes[i].IsValid = validCodes[b.BBCodes[i].Name]
+					b.BBCodes[j].IsValid = validCodes[b.BBCodes[i].Name]
 					b.BBCodes[i].Len = b.BBCodes[j].OriginalStart - b.BBCodes[i].OriginalEnd
 					continue
 				}
