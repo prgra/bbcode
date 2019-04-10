@@ -20,7 +20,13 @@ func TestParse(t *testing.T) {
 func TestPositions(t *testing.T) {
 	s := Parse("[b]b[/b][u]u[/u]")
 	spew.Dump(s)
-	if s.NewString != "[txt=ololo][code]II[/zmg]Bo[/b]llo a😪a 🍻 ss" {
+	if s.NewString != "bu" {
+		t.Fail()
+	}
+	if len(s.BBCodes) != 4 {
+		t.Fail()
+	}
+	if s.BBCodes[0].Pos != 1 || s.BBCodes[2].Pos != 2 {
 		t.Fail()
 	}
 }

@@ -1,10 +1,7 @@
 package bbcode
 
 import (
-	"fmt"
 	"strings"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 // BBCodes List of codes result for Parse function
@@ -108,20 +105,15 @@ func Parse(s string) (b BBCodes) {
 		}
 	}
 
-	// Make new string, cut untervals reverse
-	spew.Dump(b)
+	// Make new string, cut untervals and shift positions
 	b.NewString = b.Original
 	for i := 0; i < len(b.BBCodes); i++ {
 		if b.BBCodes[i].IsValid {
 			l := b.BBCodes[i].OriginalEnd - b.BBCodes[i].OriginalStart
-			fmt.Printf("cut N%d tag %s %s %d-%d\n", i+1, b.BBCodes[i].Name, b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
 			for j := i + 1; j < len(b.BBCodes); j++ {
-				// fmt.Printf("tags N%d shift, %s %d on %d, closed  %v\n", j+1, b.BBCodes[j].Name, b.BBCodes[j].Pos, b.BBCodes[i].OriginalEnd-b.BBCodes[i].OriginalStart, b.BBCodes[i].IsClose)
-				fmt.Printf("shi N%d POS %d->%d\n", j+1, b.BBCodes[j].Pos, b.BBCodes[j].Pos-(l+1))
 				b.BBCodes[j].Pos -= (l + 1)
 			}
 			b.NewString = cutString(b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
-			fmt.Println(b.NewString)
 		}
 	}
 	return
