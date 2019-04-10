@@ -1,7 +1,10 @@
 package bbcode
 
 import (
+	"fmt"
 	"strings"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 // BBCodes List of codes result for Parse function
@@ -42,12 +45,14 @@ func Parse(s string) (b BBCodes) {
 			start = true
 			tag.Name = ""
 			tag.OriginalStart = i + 1
+			tag.Pos = tag.OriginalStart
 			continue
 		}
 
 		if string(r) == "]" {
 			start = false
 			tag.OriginalEnd = i + 1
+			tag.Pos = tag.OriginalStart
 			b.BBCodes = append(b.BBCodes, tag)
 			tag = BBCode{}
 			continue
@@ -81,7 +86,7 @@ func Parse(s string) (b BBCodes) {
 					b.BBCodes[j].IsClose {
 					b.BBCodes[i].IsValid = validCodes[b.BBCodes[i].Name]
 					b.BBCodes[j].IsValid = validCodes[b.BBCodes[i].Name]
-					b.BBCodes[i].Len = b.BBCodes[j].OriginalStart - b.BBCodes[i].OriginalEnd
+					b.BBCodes[i].Len = b.BBCodes[j].OriginalStart - b.BBCodes[i].OriginalEnd - 1
 					continue
 				}
 			}
@@ -103,13 +108,20 @@ func Parse(s string) (b BBCodes) {
 		}
 	}
 
-	// Make new string, make cut untervals reverse
+	// Make new string, cut untervals reverse
+	spew.Dump(b)
 	b.NewString = b.Original
-	for i := len(b.BBCodes) - 1; i >= 0; i-- {
+	for i := 0; i < len(b.BBCodes); i++ {
 		if b.BBCodes[i].IsValid {
-			// fmt.Printf("cut %d tag %s %s %d-%d -", i, b.BBCodes[i].Name, b.NewString, b.BBCodes[i].OriginalStart, b.BBCodes[i].OriginalEnd)
-			b.NewString = cutString(b.NewString, b.BBCodes[i].OriginalStart, b.BBCodes[i].OriginalEnd)
-			// fmt.Printf("='%s'\n", b.NewString)
+			l := b.BBCodes[i].OriginalEnd - b.BBCodes[i].OriginalStart
+			fmt.Printf("cut N%d tag %s %s %d-%d\n", i+1, b.BBCodes[i].Name, b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
+			for j := i + 1; j < len(b.BBCodes); j++ {
+				// fmt.Printf("tags N%d shift, %s %d on %d, closed  %v\n", j+1, b.BBCodes[j].Name, b.BBCodes[j].Pos, b.BBCodes[i].OriginalEnd-b.BBCodes[i].OriginalStart, b.BBCodes[i].IsClose)
+				fmt.Printf("shi N%d POS %d->%d\n", j+1, b.BBCodes[j].Pos, b.BBCodes[j].Pos-(l+1))
+				b.BBCodes[j].Pos -= (l + 1)
+			}
+			b.NewString = cutString(b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
+			fmt.Println(b.NewString)
 		}
 	}
 	return
