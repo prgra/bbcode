@@ -13,6 +13,8 @@ func TestParse(t *testing.T) {
 		"[b][b][b]b[/b]":                                     "[b][b]b",
 		"[b][b][i][b]b[/b]":                                  "[b][b][i]b",
 		"[i]ii[/i][b]b[/b][/b][/b]":                          "iib[/b][/b]",
+		"[i]1[/i][i]z[/i]":                                   "1z",
+		`[b][color=red]Внимание![/color][/b]!Заказ номер [i][color=purple]xxxx[/color][/i]Сделал депозит с [color=green][b]'EUR'[/b][/color] и были пополнения ранее с [i]'Umob_Ivory_Coast'[/i] !аккаунт [color=blue]xxxx[/color] [i][color=navy]'Oke Akintunde'[/color][/i]На сумму [color=maroon]1.52 EUR[/color]Страна аккаунта: Кот-д'Ивуар`: `Внимание!!Заказ номер xxxxСделал депозит с 'EUR' и были пополнения ранее с 'Umob_Ivory_Coast' !аккаунт xxxx 'Oke Akintunde'На сумму 1.52 EURСтрана аккаунта: Кот-д'Ивуар`,
 	}
 	for k, v := range table {
 		s := Parse(k)

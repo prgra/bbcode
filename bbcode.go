@@ -32,6 +32,7 @@ var validCodes map[string]bool = map[string]bool{
 	"user":  true,
 	"code":  true,
 	"quote": true,
+	"color": true,
 }
 
 // Parse string for valid BBCode and return list of parsed values and newstring
@@ -90,10 +91,12 @@ func Parse(s string) (b BBCodes) {
 					b.BBCodes[i].OpenFor = j
 					b.BBCodes[j].CloseFor = i
 					b.BBCodes[i].Len = b.BBCodes[j].OriginalStart - b.BBCodes[i].OriginalEnd - 1
+					break
 				}
 			}
 		}
 	}
+
 	// make not valid tag open two or more times
 	for i := range b.BBCodes {
 		for j := i + 1; j < len(b.BBCodes); j++ {
