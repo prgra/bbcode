@@ -25,18 +25,18 @@ type BBCode struct {
 	OpenFor       int
 }
 
-var validCodes map[string]bool = map[string]bool{
-	"b":     true,
-	"i":     true,
-	"u":     true,
-	"user":  true,
-	"code":  true,
-	"quote": true,
-	"color": true,
-}
-
 // Parse string for valid BBCode and return list of parsed values and newstring
 func Parse(s string) (b BBCodes) {
+
+	var validCodes = map[string]bool{
+		"b":     true,
+		"i":     true,
+		"u":     true,
+		"user":  true,
+		"code":  true,
+		"quote": true,
+		"color": true,
+	}
 	var tag BBCode
 	start := false
 	b.Original = s

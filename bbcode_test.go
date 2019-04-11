@@ -2,8 +2,6 @@ package bbcode
 
 import (
 	"testing"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func TestParse(t *testing.T) {
@@ -19,7 +17,7 @@ func TestParse(t *testing.T) {
 	for k, v := range table {
 		s := Parse(k)
 		if s.NewString != v {
-			t.Errorf("TestParse error for : %s\ngot:  %s\nneed: %s\nDebug info: \n%s", k, s.NewString, v, spew.Sdump(s))
+			t.Errorf("TestParse error for : %s\ngot:  %s\nneed: %s\nDebug info: \n%v", k, s.NewString, v, s)
 
 		}
 	}
