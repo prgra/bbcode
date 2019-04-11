@@ -80,7 +80,7 @@ func Parse(s string) (b BBCodes) {
 		}
 	}
 
-	// Проходимся, ищем пары
+	// Проходимся, ищем пары, `c` учитывеат правильный закрывающий тег
 	for i := range b.BBCodes {
 		c := 0
 		if !b.BBCodes[i].IsClose {
