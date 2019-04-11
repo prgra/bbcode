@@ -105,30 +105,6 @@ func Parse(s string) (b BBCodes) {
 		}
 	}
 
-	// make not valid tag open two or more times
-	for i := range b.BBCodes {
-		for j := i + 1; j < len(b.BBCodes); j++ {
-			if !b.BBCodes[i].IsClose {
-				if b.BBCodes[i].OpenFor == b.BBCodes[j].OpenFor {
-					b.BBCodes[i].OpenFor = 0
-					b.BBCodes[i].IsValid = false
-				}
-			}
-		}
-	}
-
-	// make not valid tag closed two or more times
-	for i := len(b.BBCodes) - 1; i >= 0; i-- {
-		for j := i - 1; j >= 0; j-- {
-			if b.BBCodes[i].IsClose {
-				if b.BBCodes[i].CloseFor == b.BBCodes[j].CloseFor {
-					b.BBCodes[i].CloseFor = 0
-					b.BBCodes[i].IsValid = false
-				}
-			}
-		}
-	}
-
 	// tag code finder and turn off valid flag
 	inCode := false
 	for i := range b.BBCodes {
@@ -153,6 +129,15 @@ func Parse(s string) (b BBCodes) {
 				b.BBCodes[j].Pos -= l + 1
 			}
 			b.NewString = cutString(b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
+		}
+	}
+
+	for i := 0; i < len(b.BBCodes); i++ {
+		if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
+			p := b.BBCodes[i].OpenFor
+			if p < len(b.BBCodes) && p >= 0 {
+				b.BBCodes[i].Len = b.BBCodes[p].Pos
+			}
 		}
 	}
 	return
