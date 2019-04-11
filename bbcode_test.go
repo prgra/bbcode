@@ -7,13 +7,19 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	s := Parse("[txt=ololo][code][i]II[/i][/zmg]Bo[/b]llo a😪a 🍻 ss")
-	if s.NewString != "[txt=ololo][code]II[/zmg]Bo[/b]llo a😪a 🍻 ss" {
-		t.Fail()
+	table := map[string]string{
+		"[txt=ololo][code][i]II[/i][/zmg]Bo[/b]llo a😪a 🍻 ss": "[txt=ololo][code]II[/zmg]Bo[/b]llo a😪a 🍻 ss",
+		"[code][code][b]sdfs--[/code]":                       "[code][b]sdfs--",
+		"[b][b][b]b[/b]":                                     "[b][b]b",
+		"[b][b][i][b]b[/b]":                                  "[b][b][i]b",
+		"[i]ii[/i][b]b[/b][/b][/b]":                          "iib[/b][/b]",
 	}
-	s = Parse("[code][code][b]sdfs--[/code]")
-	if s.NewString != "[code][b]sdfs--" {
-		t.Fail()
+	for k, v := range table {
+		s := Parse(k)
+		if s.NewString != v {
+			t.Errorf("TestParse error for : %s\ngot:  %s\nneed: %s\nDebug info: \n%s", k, s.NewString, v, spew.Sdump(s))
+
+		}
 	}
 }
 

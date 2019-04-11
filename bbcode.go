@@ -21,6 +21,8 @@ type BBCode struct {
 	Name          string
 	IsClose       bool
 	IsValid       bool
+	CloseFor      int
+	OpenFor       int
 }
 
 var validCodes map[string]bool = map[string]bool{
@@ -38,6 +40,8 @@ func Parse(s string) (b BBCodes) {
 	start := false
 	b.Original = s
 	for i, r := range []rune(s) {
+		tag.CloseFor = -1
+		tag.OpenFor = -1
 		if string(r) == "[" {
 			start = true
 			tag.Name = ""
@@ -78,13 +82,37 @@ func Parse(s string) (b BBCodes) {
 	// Проходимся, ищем пары
 	for i := range b.BBCodes {
 		if !b.BBCodes[i].IsClose {
-			for j := i; j < len(b.BBCodes); j++ {
+			for j := i + 1; j < len(b.BBCodes); j++ {
 				if strings.ToLower(b.BBCodes[i].Name) == strings.ToLower(b.BBCodes[j].Name) &&
 					b.BBCodes[j].IsClose {
 					b.BBCodes[i].IsValid = validCodes[b.BBCodes[i].Name]
 					b.BBCodes[j].IsValid = validCodes[b.BBCodes[i].Name]
+					b.BBCodes[i].OpenFor = j
+					b.BBCodes[j].CloseFor = i
 					b.BBCodes[i].Len = b.BBCodes[j].OriginalStart - b.BBCodes[i].OriginalEnd - 1
-					continue
+				}
+			}
+		}
+	}
+	// make not valid tag open two or more times
+	for i := range b.BBCodes {
+		for j := i + 1; j < len(b.BBCodes); j++ {
+			if !b.BBCodes[i].IsClose {
+				if b.BBCodes[i].OpenFor == b.BBCodes[j].OpenFor {
+					b.BBCodes[i].OpenFor = 0
+					b.BBCodes[i].IsValid = false
+				}
+			}
+		}
+	}
+
+	// make not valid tag closed two or more times
+	for i := len(b.BBCodes) - 1; i >= 0; i-- {
+		for j := i - 1; j >= 0; j-- {
+			if b.BBCodes[i].IsClose {
+				if b.BBCodes[i].CloseFor == b.BBCodes[j].CloseFor {
+					b.BBCodes[i].CloseFor = 0
+					b.BBCodes[i].IsValid = false
 				}
 			}
 		}
@@ -111,7 +139,7 @@ func Parse(s string) (b BBCodes) {
 		if b.BBCodes[i].IsValid {
 			l := b.BBCodes[i].OriginalEnd - b.BBCodes[i].OriginalStart
 			for j := i + 1; j < len(b.BBCodes); j++ {
-				b.BBCodes[j].Pos -= (l + 1)
+				b.BBCodes[j].Pos -= l + 1
 			}
 			b.NewString = cutString(b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
 		}
