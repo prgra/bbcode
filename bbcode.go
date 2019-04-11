@@ -82,10 +82,17 @@ func Parse(s string) (b BBCodes) {
 
 	// Проходимся, ищем пары
 	for i := range b.BBCodes {
+		c := 0
 		if !b.BBCodes[i].IsClose {
+			c++
 			for j := i + 1; j < len(b.BBCodes); j++ {
+				if b.BBCodes[j].IsClose {
+					c--
+				} else {
+					c++
+				}
 				if strings.ToLower(b.BBCodes[i].Name) == strings.ToLower(b.BBCodes[j].Name) &&
-					b.BBCodes[j].IsClose {
+					b.BBCodes[j].IsClose && (c == 0 || b.BBCodes[i].Name == "code") {
 					b.BBCodes[i].IsValid = validCodes[b.BBCodes[i].Name]
 					b.BBCodes[j].IsValid = validCodes[b.BBCodes[i].Name]
 					b.BBCodes[i].OpenFor = j
