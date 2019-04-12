@@ -25,33 +25,42 @@ type BBCode struct {
 	OpenFor       int
 }
 
+var validCodes = map[string]bool{
+	"b":     true,
+	"i":     true,
+	"u":     true,
+	"user":  true,
+	"code":  true,
+	"quote": true,
+	"color": true,
+}
+
 // Parse string for valid BBCode and return list of parsed values and newstring
 func Parse(s string) (b BBCodes) {
-
-	var validCodes = map[string]bool{
-		"b":     true,
-		"i":     true,
-		"u":     true,
-		"user":  true,
-		"code":  true,
-		"quote": true,
-		"color": true,
-	}
 	var tag BBCode
 	start := false
 	b.Original = s
-	for i, r := range []rune(s) {
+	rs := []rune(s)
+	for i := range rs {
 		tag.CloseFor = -1
 		tag.OpenFor = -1
-		if string(r) == "[" {
-			start = true
-			tag.Name = ""
-			tag.OriginalStart = i + 1
-			tag.Pos = tag.OriginalStart
+		if string(rs[i]) == "[" {
+			for j := i + 1; j < len(rs); j++ {
+				if string(rs[j]) == "[" {
+					start = false
+					break
+				}
+				if string(rs[j]) == "]" {
+					start = true
+					tag.Name = ""
+					tag.OriginalStart = i + 1
+					tag.Pos = tag.OriginalStart
+					break
+				}
+			}
 			continue
 		}
-
-		if string(r) == "]" {
+		if string(rs[i]) == "]" && start {
 			start = false
 			tag.OriginalEnd = i + 1
 			tag.Pos = tag.OriginalStart
@@ -61,7 +70,7 @@ func Parse(s string) (b BBCodes) {
 		}
 
 		if start {
-			tag.Name += string(r)
+			tag.Name += string(rs[i])
 		}
 	}
 
@@ -80,9 +89,10 @@ func Parse(s string) (b BBCodes) {
 		}
 	}
 
+	c := 0
 	// Проходимся, ищем пары, `c` учитывеат правильный закрывающий тег
 	for i := range b.BBCodes {
-		c := 0
+		c = 0
 		if !b.BBCodes[i].IsClose {
 			c++
 			for j := i + 1; j < len(b.BBCodes); j++ {

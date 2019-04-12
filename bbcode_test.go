@@ -1,7 +1,10 @@
 package bbcode
 
 import (
+	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestParse(t *testing.T) {
@@ -13,6 +16,7 @@ func TestParse(t *testing.T) {
 		"[i]ii[/i][b]b[/b][/b][/b]":                          "iib[/b][/b]",
 		"[i]1[/i][i]z[/i]":                                   "1z",
 		"[color=red]1[color=green]gr[/color]red[/color]":     "1grred",
+		"[[b]][[/b]]":                                        "[][]",
 	}
 	for k, v := range table {
 		s := Parse(k)
@@ -20,6 +24,35 @@ func TestParse(t *testing.T) {
 			t.Errorf("TestParse error for : %s\ngot:  %s\nneed: %s\nDebug info: \n%v", k, s.NewString, v, s)
 
 		}
+	}
+}
+
+func BenchmarkSample(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		if x := fmt.Sprintf("%d", 42); x != "42" {
+			b.Fatalf("Unexpected string: %s", x)
+		}
+	}
+}
+
+func BenchmarkParse(b *testing.B) {
+	table := []string{
+		"[txt=ololo][code][i]II[/i][/zmg]Bo[/b]llo a😪a 🍻 ss",
+		"[code][code][b]sdfs--[/code]",
+		"[b][b][b]b[/b]",
+		"[b][b][i][b]b[/b]",
+		"[i]ii[/i][b]b[/b][/b][/b]",
+		"[i]1[/i][i]z[/i]",
+		"[color=red]1[color=green]gr[/color]red[/color]",
+	}
+	rand.Seed(time.Now().UnixNano())
+	j := 0
+	for i := 0; i < b.N; i++ {
+		j++
+		if j > len(table)-1 {
+			j = 0
+		}
+		Parse(table[j])
 	}
 }
 
