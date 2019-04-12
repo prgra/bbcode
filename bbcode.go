@@ -37,15 +37,16 @@ var validCodes = map[string]bool{
 
 // Parse string for valid BBCode and return list of parsed values and newstring
 func Parse(s string) (b BBCodes) {
+	var i, j int
 	var tag BBCode
 	start := false
 	b.Original = s
 	rs := []rune(s)
-	for i := range rs {
+	for i = range rs {
 		tag.CloseFor = -1
 		tag.OpenFor = -1
 		if string(rs[i]) == "[" {
-			for j := i + 1; j < len(rs); j++ {
+			for j = i + 1; j < len(rs); j++ {
 				if string(rs[j]) == "[" {
 					start = false
 					break
@@ -75,7 +76,7 @@ func Parse(s string) (b BBCodes) {
 	}
 
 	// Ищем закрыте и выставляем флаг
-	for i := range b.BBCodes {
+	for i = range b.BBCodes {
 		if strings.HasPrefix(b.BBCodes[i].Name, "/") {
 			b.BBCodes[i].IsClose = true
 			b.BBCodes[i].Name = strings.Replace(b.BBCodes[i].Name, "/", "", 1)
@@ -91,7 +92,7 @@ func Parse(s string) (b BBCodes) {
 
 	c := 0
 	// Проходимся, ищем пары, `c` учитывеат правильный закрывающий тег
-	for i := range b.BBCodes {
+	for i = range b.BBCodes {
 		c = 0
 		if !b.BBCodes[i].IsClose {
 			c++
@@ -117,7 +118,7 @@ func Parse(s string) (b BBCodes) {
 
 	// tag code finder and turn off valid flag
 	inCode := false
-	for i := range b.BBCodes {
+	for i = range b.BBCodes {
 		if strings.ToLower(b.BBCodes[i].Name) == "code" && b.BBCodes[i].IsValid && !inCode {
 			inCode = true
 			continue
@@ -132,17 +133,17 @@ func Parse(s string) (b BBCodes) {
 
 	// Make new string, cut untervals and shift positions
 	b.NewString = b.Original
-	for i := 0; i < len(b.BBCodes); i++ {
+	for i = 0; i < len(b.BBCodes); i++ {
 		if b.BBCodes[i].IsValid {
 			l := b.BBCodes[i].OriginalEnd - b.BBCodes[i].OriginalStart
-			for j := i + 1; j < len(b.BBCodes); j++ {
+			for j = i + 1; j < len(b.BBCodes); j++ {
 				b.BBCodes[j].Pos -= l + 1
 			}
 			b.NewString = cutString(b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
 		}
 	}
 
-	for i := 0; i < len(b.BBCodes); i++ {
+	for i = 0; i < len(b.BBCodes); i++ {
 		if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
 			p := b.BBCodes[i].OpenFor
 			if p < len(b.BBCodes) && p >= 0 {
