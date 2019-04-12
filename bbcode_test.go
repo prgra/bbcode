@@ -1,7 +1,6 @@
 package bbcode
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -23,14 +22,6 @@ func TestParse(t *testing.T) {
 		if s.NewString != v {
 			t.Errorf("TestParse error for : %s\ngot:  %s\nneed: %s\nDebug info: \n%v", k, s.NewString, v, s)
 
-		}
-	}
-}
-
-func BenchmarkSample(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		if x := fmt.Sprintf("%d", 42); x != "42" {
-			b.Fatalf("Unexpected string: %s", x)
 		}
 	}
 }

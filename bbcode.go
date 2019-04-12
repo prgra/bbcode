@@ -96,7 +96,7 @@ func Parse(s string) (b BBCodes) {
 		c = 0
 		if !b.BBCodes[i].IsClose {
 			c++
-			for j := i + 1; j < len(b.BBCodes); j++ {
+			for j = i + 1; j < len(b.BBCodes); j++ {
 				if b.BBCodes[j].IsClose {
 					c--
 				} else {
