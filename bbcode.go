@@ -29,10 +29,13 @@ var validCodes = map[string]bool{
 	"b":     true,
 	"i":     true,
 	"u":     true,
+	"s":     true,
 	"user":  true,
 	"code":  true,
 	"quote": true,
 	"color": true,
+	"size":  true,
+	"url":   true,
 }
 
 // Parse string for valid BBCode and return list of parsed values and newstring
