@@ -147,7 +147,7 @@ func Parse(s string) (b BBCodes) {
 		if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
 			p := b.BBCodes[i].OpenFor
 			if p < len(b.BBCodes) && p >= 0 {
-				b.BBCodes[i].Len = b.BBCodes[p].Pos
+				b.BBCodes[i].Len = b.BBCodes[p].Pos - b.BBCodes[i].Pos
 			}
 		}
 	}
