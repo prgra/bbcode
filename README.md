@@ -1,4 +1,7 @@
 # bbcode
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/prgra/bbcode)](https://goreportcard.com/report/github.com/prgra/bbcode)
+
 ### golang bbcode parser
 
 usage:
