@@ -4,6 +4,8 @@ import (
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestParse(t *testing.T) {
@@ -16,6 +18,7 @@ func TestParse(t *testing.T) {
 		"[i]1[/i][i]z[/i]":                                   "1z",
 		"[color=red]1[color=green]gr[/color]red[/color]":     "1grred",
 		"[[b]][[/b]]":                                        "[][]",
+		"[b]b[/b][u]u[/u]":                                   "bu",
 	}
 	for k, v := range table {
 		s := Parse(k)
@@ -49,14 +52,19 @@ func BenchmarkParse(b *testing.B) {
 
 func TestPositions(t *testing.T) {
 	s := Parse("[b]b[/b][u]u[/u]")
-	if s.NewString != "bu" {
-		t.Fail()
-	}
 	if len(s.BBCodes) != 4 {
-		t.Fail()
+		t.Error("count bbcode err need 4")
 	}
 	if s.BBCodes[0].Pos != 1 || s.BBCodes[2].Pos != 2 {
-		t.Fail()
+		t.Error("poses err")
+	}
+	s = Parse("[b]👩test[/b]")
+	if s.NewString != "👩test" {
+		t.Errorf("TestPositions new string: got:  %s\nneed: 👩test \nDebug info: \n%v", s.NewString, spew.Sdump(s))
+	}
+
+	if s.BBCodes[0].Len != 6 {
+		t.Errorf("TestPositions error: got:  %d\nneed: 6\nDebug info: \n%v", s.BBCodes[0].Len, spew.Sdump(s))
 	}
 }
 

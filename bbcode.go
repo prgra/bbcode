@@ -154,6 +154,21 @@ func Parse(s string) (b BBCodes) {
 			}
 		}
 	}
+
+	for p, r := range b.NewString {
+		if len(string(r)) > 1 {
+			for j := range b.BBCodes {
+				// fmt.Println(b.BBCodes[j].Pos >= p+1, b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1)
+				if b.BBCodes[j].Pos >= p+1 && b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1 {
+					// fmt.Println("aaasjdaljsdlajslaj", spew.Sdump(b.BBCodes[j]), p)
+					b.BBCodes[j].Len += len(string(r))/2 - 1
+				}
+				if b.BBCodes[j].Pos > p+1 {
+					b.BBCodes[j].Pos += len(string(r))/2 - 1
+				}
+			}
+		}
+	}
 	return
 }
 
