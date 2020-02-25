@@ -58,13 +58,22 @@ func TestPositions(t *testing.T) {
 	if s.BBCodes[0].Pos != 1 || s.BBCodes[2].Pos != 2 {
 		t.Error("poses err")
 	}
-	s = Parse("[b]👩test[/b]")
-	if s.NewString != "👩test" {
+	s = Parse("[b]👩test[/b][i]ing[/i]")
+	if s.NewString != "👩testing" {
 		t.Errorf("TestPositions new string: got:  %s\nneed: 👩test \nDebug info: \n%v", s.NewString, spew.Sdump(s))
 	}
-
 	if s.BBCodes[0].Len != 6 {
 		t.Errorf("TestPositions error: got:  %d\nneed: 6\nDebug info: \n%v", s.BBCodes[0].Len, spew.Sdump(s))
+	}
+	if s.BBCodes[1].Pos != 7 {
+		t.Errorf("TestPositions error: got:  %d\nneed: 7\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
+	}
+}
+
+func TestUrl(t *testing.T) {
+	s := Parse("[url=http://google.com?q=123]test ok[/url]")
+	if s.NewString != "test ok" {
+		t.Errorf("wrong text need 'test ok' got %s\nDebug info: \n%v", s.NewString, spew.Sdump(s))
 	}
 }
 

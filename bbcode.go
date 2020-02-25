@@ -86,9 +86,9 @@ func Parse(s string) (b BBCodes) {
 		}
 		if strings.Index(b.BBCodes[i].Name, "=") != -1 {
 			kv := strings.Split(b.BBCodes[i].Name, "=")
-			if len(kv) == 2 {
+			if len(kv) >= 2 {
 				b.BBCodes[i].Name = kv[0]
-				b.BBCodes[i].Param = kv[1]
+				b.BBCodes[i].Param = strings.Join(kv[1:len(kv)], "=")
 			}
 		}
 	}
