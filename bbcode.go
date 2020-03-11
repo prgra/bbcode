@@ -38,6 +38,10 @@ var validCodes = map[string]bool{
 	"url":   true,
 }
 
+var multiCodes = map[string]bool{
+	"color": true,
+}
+
 // Parse string for valid BBCode and return list of parsed values and newstring
 func Parse(s string) (b BBCodes) {
 	var i, j int
@@ -92,21 +96,26 @@ func Parse(s string) (b BBCodes) {
 		}
 	}
 
-	c := 0
 	// Проходимся, ищем пары, `c` учитывеат правильный закрывающий тег
 	for i = range b.BBCodes {
-		c = 0
 		if !b.BBCodes[i].IsClose {
-			c++
+			cm := make(map[string]int)
+			cm[strings.ToLower(b.BBCodes[i].Name)]++
 			for j = i + 1; j < len(b.BBCodes); j++ {
+				if strings.ToLower(b.BBCodes[i].Name) == strings.ToLower(b.BBCodes[j].Name) && !b.BBCodes[j].IsClose &&
+					!multiCodes[strings.ToLower(b.BBCodes[i].Name)] {
+					b.BBCodes[i].IsValid = false
+					break
+				}
+				if !b.BBCodes[j].IsClose {
+					cm[strings.ToLower(b.BBCodes[j].Name)]++
+				}
 				if b.BBCodes[j].IsClose {
-					c--
-				} else {
-					c++
+					cm[strings.ToLower(b.BBCodes[j].Name)]--
 				}
 				if strings.ToLower(b.BBCodes[i].Name) == strings.ToLower(b.BBCodes[j].Name) &&
 					b.BBCodes[j].IsClose &&
-					(c <= 0 || strings.ToLower(b.BBCodes[i].Name) == "code") {
+					(cm[b.BBCodes[i].Name] == 0) {
 					b.BBCodes[i].IsValid = validCodes[strings.ToLower(b.BBCodes[i].Name)]
 					b.BBCodes[j].IsValid = validCodes[strings.ToLower(b.BBCodes[i].Name)]
 					b.BBCodes[i].OpenFor = j

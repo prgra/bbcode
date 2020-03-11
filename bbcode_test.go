@@ -22,6 +22,7 @@ func TestParse(t *testing.T) {
 		"[b]b[/b][u]u[/u]":                                   "bu",
 		"[B]b[/b][U]u[/U]":                                   "bu",
 		"[color=black]black[code][/code][/a][/color][ssss]":  "black[/a][ssss]",
+		"[color=black]black[code][a]ololo2[/code][/color]":   "black[a]ololo2",
 	}
 	for k, v := range table {
 		s := Parse(k)
