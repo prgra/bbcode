@@ -77,7 +77,6 @@ func Parse(s string) (b BBCodes) {
 			tag.Name += string(rs[i])
 		}
 	}
-
 	// Ищем закрыте и выставляем флаг
 	for i = range b.BBCodes {
 		if strings.HasPrefix(b.BBCodes[i].Name, "/") {
@@ -107,7 +106,7 @@ func Parse(s string) (b BBCodes) {
 				}
 				if strings.ToLower(b.BBCodes[i].Name) == strings.ToLower(b.BBCodes[j].Name) &&
 					b.BBCodes[j].IsClose &&
-					(c == 0 || strings.ToLower(b.BBCodes[i].Name) == "code") {
+					(c <= 0 || strings.ToLower(b.BBCodes[i].Name) == "code") {
 					b.BBCodes[i].IsValid = validCodes[strings.ToLower(b.BBCodes[i].Name)]
 					b.BBCodes[j].IsValid = validCodes[strings.ToLower(b.BBCodes[i].Name)]
 					b.BBCodes[i].OpenFor = j
