@@ -17,8 +17,10 @@ func TestParse(t *testing.T) {
 		"[i]ii[/i][b]b[/b][/b][/b]":                          "iib[/b][/b]",
 		"[i]1[/i][i]z[/i]":                                   "1z",
 		"[color=red]1[color=green]gr[/color]red[/color]":     "1grred",
+		"[Color=red]1[color=green]gr[/Color]red[/color]":     "1grred",
 		"[[b]][[/b]]":                                        "[][]",
 		"[b]b[/b][u]u[/u]":                                   "bu",
+		"[B]b[/b][U]u[/U]":                                   "bu",
 	}
 	for k, v := range table {
 		s := Parse(k)
@@ -58,8 +60,8 @@ func TestPositions(t *testing.T) {
 	if s.BBCodes[0].Pos != 1 || s.BBCodes[2].Pos != 2 {
 		t.Error("poses err")
 	}
-	s = Parse("[b]👩test[/b][i]ing[/i]")
-	if s.NewString != "👩testing" {
+	s = Parse("[b]👩test[/b][i]👩‍👩‍👦‍👦ing[/i]123")
+	if s.NewString != "👩test👩‍👩‍👦‍👦ing" {
 		t.Errorf("TestPositions new string: got:  %s\nneed: 👩test \nDebug info: \n%v", s.NewString, spew.Sdump(s))
 	}
 	if s.BBCodes[0].Len != 6 {
