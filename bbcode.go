@@ -2,6 +2,8 @@ package bbcode
 
 import (
 	"strings"
+
+	"github.com/mvdan/xurls"
 )
 
 // BBCodes List of codes result for Parse function
@@ -187,4 +189,40 @@ func cutString(s string, f int, t int) (res string) {
 		}
 	}
 	return
+}
+
+func (b *BBCodes) makeURLs() {
+	re := xurls.Strict()
+	lns := re.FindAllIndex([]byte(b.NewString), -1)
+	org := re.FindAllIndex([]byte(b.Original), -1)
+	prm := re.FindAll([]byte(b.Original), -1)
+	for i := range lns {
+		if len(lns[i]) == 2 && len(org[i]) == 2 {
+			bopen := BBCode{
+				OriginalStart: org[i][0],
+				OriginalEnd:   org[i][1] - org[i][0],
+				Pos:           lns[i][0],
+				Len:           lns[i][1] - lns[i][0],
+				Param:         string(prm[i]),
+				Name:          "url",
+				IsClose:       false,
+				IsValid:       true,
+				CloseFor:      -1,
+				OpenFor:       len(b.BBCodes) + 1,
+			}
+			bclose := BBCode{
+				OriginalStart: org[i][1],
+				OriginalEnd:   org[i][1] + 3, // len(url) = 3
+				Pos:           lns[i][1],
+				Len:           0,
+				Name:          "url",
+				IsClose:       true,
+				IsValid:       true,
+				CloseFor:      len(b.BBCodes),
+				OpenFor:       -1,
+			}
+			b.BBCodes = append(b.BBCodes, bopen, bclose)
+
+		}
+	}
 }

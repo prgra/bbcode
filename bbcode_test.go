@@ -93,3 +93,9 @@ func TestCutString(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestMakeURLs(t *testing.T) {
+	a := "[b]asdas[/b]http://ya.ru?q=123&t=3 https://mail.ru"
+	bb := Parse(a)
+	bb.makeURLs()
+}
