@@ -95,7 +95,9 @@ func TestCutString(t *testing.T) {
 }
 
 func TestMakeURLs(t *testing.T) {
-	a := "[b]asdas[/b]http://ya.ru?q=123&t=3 https://mail.ru"
+	a := "[b]asdas[/b][url=http://google.com]https://google.com[/url]http://ya.ru?q=123&t=3 https://mail.ru"
 	bb := Parse(a)
-	bb.makeURLs()
+	bb.MakeURLs()
+	spew.Dump(bb)
+	t.Fail()
 }

@@ -1,6 +1,7 @@
 package bbcode
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/mvdan/xurls"
@@ -191,13 +192,33 @@ func cutString(s string, f int, t int) (res string) {
 	return
 }
 
-func (b *BBCodes) makeURLs() {
+func (b *BBCodes) MakeURLs() {
 	re := xurls.Strict()
+	fmt.Println(re.String())
 	lns := re.FindAllIndex([]byte(b.NewString), -1)
 	org := re.FindAllIndex([]byte(b.Original), -1)
 	prm := re.FindAll([]byte(b.Original), -1)
+	type urlrange struct {
+		from int
+		to   int
+	}
+	var urlranges []urlrange
+	for i := range b.BBCodes {
+		if strings.ToLower(b.BBCodes[i].Name) == "url" {
+			urlranges = append(urlranges, urlrange{from: b.BBCodes[i].Pos, to: b.BBCodes[i].Pos + b.BBCodes[i].Len})
+		}
+	}
 	for i := range lns {
 		if len(lns[i]) == 2 && len(org[i]) == 2 {
+			fnd := false
+			for j := range urlranges {
+				if urlranges[j].from >= lns[i][0] && urlranges[j].to <= lns[i][0] {
+					fnd = true
+				}
+			}
+			if fnd {
+				continue
+			}
 			bopen := BBCode{
 				OriginalStart: org[i][0],
 				OriginalEnd:   org[i][1] - org[i][0],
