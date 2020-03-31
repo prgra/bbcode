@@ -1,7 +1,6 @@
 package bbcode
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/mvdan/xurls"
@@ -192,33 +191,26 @@ func cutString(s string, f int, t int) (res string) {
 	return
 }
 
+// MakeURLs make url tags from text
 func (b *BBCodes) MakeURLs() {
-	re := xurls.Strict()
-	fmt.Println(re.String())
-	lns := re.FindAllIndex([]byte(b.NewString), -1)
-	org := re.FindAllIndex([]byte(b.Original), -1)
-	prm := re.FindAll([]byte(b.Original), -1)
-	type urlrange struct {
-		from int
-		to   int
-	}
-	var urlranges []urlrange
+	nstr := b.NewString
+	ostr := b.Original
 	for i := range b.BBCodes {
-		if strings.ToLower(b.BBCodes[i].Name) == "url" {
-			urlranges = append(urlranges, urlrange{from: b.BBCodes[i].Pos, to: b.BBCodes[i].Pos + b.BBCodes[i].Len})
+		if strings.ToLower(b.BBCodes[i].Name) != "url" || b.BBCodes[i].IsClose || !b.BBCodes[i].IsValid {
+			continue
 		}
+		nstr = cutString(nstr, b.BBCodes[i].Pos-1, b.BBCodes[i].Pos-1+b.BBCodes[i].Len)
+		nstr = strings.Repeat(" ", b.BBCodes[i].Len) + nstr
+		ostr = cutString(ostr, b.BBCodes[i].OriginalStart, b.BBCodes[b.BBCodes[i].OpenFor].OriginalEnd)
+		ostr = strings.Repeat(" ", b.BBCodes[b.BBCodes[i].OpenFor].OriginalEnd-b.BBCodes[i].OriginalStart+1) + ostr
 	}
+	re := xurls.Strict()
+	lns := re.FindAllIndex([]byte(nstr), -1)
+	prm := re.FindAll([]byte([]byte(nstr)), -1)
+	org := re.FindAllIndex([]byte(b.Original), -1)
+
 	for i := range lns {
-		if len(lns[i]) == 2 && len(org[i]) == 2 {
-			fnd := false
-			for j := range urlranges {
-				if urlranges[j].from >= lns[i][0] && urlranges[j].to <= lns[i][0] {
-					fnd = true
-				}
-			}
-			if fnd {
-				continue
-			}
+		if len(lns[i]) == 2 {
 			bopen := BBCode{
 				OriginalStart: org[i][0],
 				OriginalEnd:   org[i][1] - org[i][0],
@@ -243,7 +235,6 @@ func (b *BBCodes) MakeURLs() {
 				OpenFor:       -1,
 			}
 			b.BBCodes = append(b.BBCodes, bopen, bclose)
-
 		}
 	}
 }

@@ -95,9 +95,14 @@ func TestCutString(t *testing.T) {
 }
 
 func TestMakeURLs(t *testing.T) {
-	a := "[b]asdas[/b][url=http://google.com]https://google.com[/url]http://ya.ru?q=123&t=3 https://mail.ru"
+	a := "[url=http://google.com]http://bing.com[/url]https://mail.com"
 	bb := Parse(a)
 	bb.MakeURLs()
-	spew.Dump(bb)
-	t.Fail()
+	if len(bb.BBCodes) != 4 {
+		t.Errorf("wrong count of bbcodes got:%d, need: 4", len(bb.BBCodes))
+	}
+	if bb.BBCodes[3].Name != "url" {
+		t.Errorf("wrong name bbcode got:%s, need: url", bb.BBCodes[3].Name)
+	}
+
 }
