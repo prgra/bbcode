@@ -3,7 +3,7 @@ package bbcode
 import (
 	"strings"
 
-	"github.com/mvdan/xurls"
+	"mvdan.cc/xurls/v2"
 )
 
 // BBCodes List of codes result for Parse function
@@ -80,20 +80,20 @@ func Parse(s string) (b BBCodes) {
 		}
 
 		if start {
-			tag.Name += string(rs[i])
+			tag.Name += strings.ToLower(string(rs[i]))
 		}
 	}
 	// Ищем закрыте и выставляем флаг
 	for i = range b.BBCodes {
 		if strings.HasPrefix(b.BBCodes[i].Name, "/") {
 			b.BBCodes[i].IsClose = true
-			b.BBCodes[i].Name = strings.Replace(b.BBCodes[i].Name, "/", "", 1)
+			b.BBCodes[i].Name = strings.ToLower(strings.Replace(b.BBCodes[i].Name, "/", "", 1))
 		}
 		if strings.Index(b.BBCodes[i].Name, "=") != -1 {
 			kv := strings.Split(b.BBCodes[i].Name, "=")
 			if len(kv) >= 2 {
 				b.BBCodes[i].Name = kv[0]
-				b.BBCodes[i].Param = strings.Join(kv[1:len(kv)], "=")
+				b.BBCodes[i].Param = strings.Join(kv[1:], "=")
 			}
 		}
 	}
@@ -102,24 +102,24 @@ func Parse(s string) (b BBCodes) {
 	for i = range b.BBCodes {
 		if !b.BBCodes[i].IsClose {
 			cm := make(map[string]int)
-			cm[strings.ToLower(b.BBCodes[i].Name)]++
+			cm[b.BBCodes[i].Name]++
 			for j = i + 1; j < len(b.BBCodes); j++ {
-				if strings.ToLower(b.BBCodes[i].Name) == strings.ToLower(b.BBCodes[j].Name) && !b.BBCodes[j].IsClose &&
-					!multiCodes[strings.ToLower(b.BBCodes[i].Name)] {
+				if b.BBCodes[i].Name == b.BBCodes[j].Name && !b.BBCodes[j].IsClose &&
+					!multiCodes[b.BBCodes[i].Name] {
 					b.BBCodes[i].IsValid = false
 					break
 				}
 				if !b.BBCodes[j].IsClose {
-					cm[strings.ToLower(b.BBCodes[j].Name)]++
+					cm[b.BBCodes[j].Name]++
 				}
 				if b.BBCodes[j].IsClose {
-					cm[strings.ToLower(b.BBCodes[j].Name)]--
+					cm[b.BBCodes[j].Name]--
 				}
-				if strings.ToLower(b.BBCodes[i].Name) == strings.ToLower(b.BBCodes[j].Name) &&
+				if b.BBCodes[i].Name == b.BBCodes[j].Name &&
 					b.BBCodes[j].IsClose &&
 					(cm[b.BBCodes[i].Name] == 0) {
-					b.BBCodes[i].IsValid = validCodes[strings.ToLower(b.BBCodes[i].Name)]
-					b.BBCodes[j].IsValid = validCodes[strings.ToLower(b.BBCodes[i].Name)]
+					b.BBCodes[i].IsValid = validCodes[b.BBCodes[i].Name]
+					b.BBCodes[j].IsValid = validCodes[b.BBCodes[i].Name]
 					b.BBCodes[i].OpenFor = j
 					b.BBCodes[j].CloseFor = i
 					b.BBCodes[i].Len = b.BBCodes[j].OriginalStart - b.BBCodes[i].OriginalEnd - 1
@@ -132,11 +132,11 @@ func Parse(s string) (b BBCodes) {
 	// tag code finder and turn off valid flag
 	inCode := false
 	for i = range b.BBCodes {
-		if strings.ToLower(b.BBCodes[i].Name) == "code" && b.BBCodes[i].IsValid && !inCode {
+		if b.BBCodes[i].Name == "code" && b.BBCodes[i].IsValid && !inCode {
 			inCode = true
 			continue
 		}
-		if strings.ToLower(b.BBCodes[i].Name) == "code" && b.BBCodes[i].IsClose {
+		if b.BBCodes[i].Name == "code" && b.BBCodes[i].IsClose {
 			inCode = false
 		}
 		if inCode {
