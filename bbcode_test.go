@@ -104,5 +104,12 @@ func TestMakeURLs(t *testing.T) {
 	if bb.BBCodes[3].Name != "url" {
 		t.Errorf("wrong name bbcode got:%s, need: url", bb.BBCodes[3].Name)
 	}
+	bb = Parse("[url=http://ya.ru/q=Tv_vT]asda[/url]")
+	if bb.NewString != "asda" {
+		t.Errorf("wrong new string: need 'asda', got '%s'", bb.NewString)
+	}
+	if bb.BBCodes[0].Param != "http://ya.ru/q=Tv_vT" {
+		t.Errorf("wrong Param: need 'asda', got '%s'", bb.NewString)
+	}
 
 }

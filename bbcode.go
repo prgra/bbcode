@@ -80,7 +80,7 @@ func Parse(s string) (b BBCodes) {
 		}
 
 		if start {
-			tag.Name += strings.ToLower(string(rs[i]))
+			tag.Name += string(rs[i])
 		}
 	}
 	// Ищем закрыте и выставляем флаг
@@ -92,9 +92,11 @@ func Parse(s string) (b BBCodes) {
 		if strings.Index(b.BBCodes[i].Name, "=") != -1 {
 			kv := strings.Split(b.BBCodes[i].Name, "=")
 			if len(kv) >= 2 {
-				b.BBCodes[i].Name = kv[0]
+				b.BBCodes[i].Name = strings.ToLower(kv[0])
 				b.BBCodes[i].Param = strings.Join(kv[1:], "=")
 			}
+		} else {
+			b.BBCodes[i].Name = strings.ToLower(b.BBCodes[i].Name)
 		}
 	}
 
