@@ -2,8 +2,6 @@ package bbcode
 
 import (
 	"strings"
-
-	"mvdan.cc/xurls/v2"
 )
 
 // BBCodes List of codes result for Parse function
@@ -206,10 +204,9 @@ func (b *BBCodes) MakeURLs() {
 		ostr = cutString(ostr, b.BBCodes[i].OriginalStart, b.BBCodes[b.BBCodes[i].OpenFor].OriginalEnd)
 		ostr = strings.Repeat(" ", b.BBCodes[b.BBCodes[i].OpenFor].OriginalEnd-b.BBCodes[i].OriginalStart+1) + ostr
 	}
-	re := xurls.Strict()
-	lns := re.FindAllIndex([]byte(nstr), -1)
-	prm := re.FindAll([]byte([]byte(nstr)), -1)
-	org := re.FindAllIndex([]byte(b.Original), -1)
+	lns := urlre.FindAllIndex([]byte(nstr), -1)
+	prm := urlre.FindAll([]byte([]byte(nstr)), -1)
+	org := urlre.FindAllIndex([]byte(b.Original), -1)
 
 	for i := range lns {
 		if len(lns[i]) == 2 {
