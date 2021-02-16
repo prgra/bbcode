@@ -66,11 +66,11 @@ func TestPositions(t *testing.T) {
 	if s.NewString != "👩test👩‍👩‍👦‍👦ing123" {
 		t.Errorf("TestPositions new string: got:  %s\nneed: 👩test \nDebug info: \n%v", s.NewString, spew.Sdump(s))
 	}
-	if s.BBCodes[0].Len != 6 {
-		t.Errorf("TestPositions error: got:  %d\nneed: 6\nDebug info: \n%v", s.BBCodes[0].Len, spew.Sdump(s))
+	if s.BBCodes[0].Len != 5 {
+		t.Errorf("TestPositions error: got:  %d\nneed: 5\nDebug info: \n%v", s.BBCodes[0].Len, spew.Sdump(s))
 	}
-	if s.BBCodes[1].Pos != 7 {
-		t.Errorf("TestPositions error: got:  %d\nneed: 7\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
+	if s.BBCodes[1].Pos != 6 {
+		t.Errorf("TestPositions error: got:  %d\nneed: 4\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
 	}
 }
 
@@ -112,4 +112,21 @@ func TestMakeURLs(t *testing.T) {
 		t.Errorf("wrong Param: need 'asda', got '%s'", bb.NewString)
 	}
 
+}
+
+func TestUtfLens(t *testing.T) {
+	str := "Напоминание[color=gray]🔆️[/color] [user=490]Name[/user]"
+	bb := Parse(str)
+	if bb.BBCodes[0].Len != 1 {
+		t.Errorf("wrong Len 0: need 1, got '%d'", bb.BBCodes[0].Len)
+	}
+	if bb.BBCodes[0].Pos != 12 {
+		t.Errorf("wrong Pos 0: need 12, got '%d'", bb.BBCodes[0].Len)
+	}
+	if bb.BBCodes[2].Pos != 14 {
+		t.Errorf("wrong Pos 2: need 14, got '%d'", bb.BBCodes[2].Pos)
+	}
+	if bb.BBCodes[3].Pos != 18 {
+		t.Errorf("wrong Pos 3: need 18, got '%d'", bb.BBCodes[3].Pos)
+	}
 }

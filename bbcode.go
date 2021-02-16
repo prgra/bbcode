@@ -2,6 +2,8 @@ package bbcode
 
 import (
 	"strings"
+
+	"github.com/rivo/uniseg"
 )
 
 // BBCodes List of codes result for Parse function
@@ -23,6 +25,7 @@ type BBCode struct {
 	IsValid       bool
 	CloseFor      int
 	OpenFor       int
+	Text          string
 }
 
 var validCodes = map[string]bool{
@@ -96,6 +99,9 @@ func Parse(s string) (b BBCodes) {
 		} else {
 			b.BBCodes[i].Name = strings.ToLower(b.BBCodes[i].Name)
 		}
+		if !b.BBCodes[i].IsClose && len(b.BBCodes) > i+1 {
+			b.BBCodes[i].Text, b.BBCodes[i].Len = getRunesRange(b.Original, b.BBCodes[i].OriginalEnd, b.BBCodes[i+1].OriginalStart-1)
+		}
 	}
 
 	// Проходимся, ищем пары, `c` учитывеат правильный закрывающий тег
@@ -122,7 +128,7 @@ func Parse(s string) (b BBCodes) {
 					b.BBCodes[j].IsValid = validCodes[b.BBCodes[i].Name]
 					b.BBCodes[i].OpenFor = j
 					b.BBCodes[j].CloseFor = i
-					b.BBCodes[i].Len = b.BBCodes[j].OriginalStart - b.BBCodes[i].OriginalEnd - 1
+					// b.BBCodes[i].Len = b.BBCodes[j].OriginalStart - b.BBCodes[i].OriginalEnd - 1
 					break
 				}
 			}
@@ -155,30 +161,38 @@ func Parse(s string) (b BBCodes) {
 			b.NewString = cutString(b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
 		}
 	}
+	//Shift Positions with utf8 Graphemes
 
-	for i = 0; i < len(b.BBCodes); i++ {
-		if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
-			p := b.BBCodes[i].OpenFor
-			if p < len(b.BBCodes) && p >= 0 {
-				b.BBCodes[i].Len = b.BBCodes[p].Pos - b.BBCodes[i].Pos
-			}
+	sft := 0
+	for i := range b.BBCodes {
+		b.BBCodes[i].Pos -= sft
+		if !b.BBCodes[i].IsClose {
+			sft += getRunesLen(b.BBCodes[i].Text) - getGraphemesLen(b.BBCodes[i].Text)
 		}
 	}
+	// for i = 0; i < len(b.BBCodes); i++ {
+	// 	if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
+	// 		p := b.BBCodes[i].OpenFor
+	// 		if p < len(b.BBCodes) && p >= 0 {
+	// 			b.BBCodes[i].Len = b.BBCodes[p].Pos - b.BBCodes[i].Pos
+	// 		}
+	// 	}
+	// }
 
-	for p, r := range b.NewString {
-		if len(string(r)) > 1 {
-			for j := range b.BBCodes {
-				// fmt.Println(b.BBCodes[j].Pos >= p+1, b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1)
-				if b.BBCodes[j].Pos >= p+1 && b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1 {
-					// fmt.Println("aaasjdaljsdlajslaj", spew.Sdump(b.BBCodes[j]), p)
-					b.BBCodes[j].Len += len(string(r))/2 - 1
-				}
-				if b.BBCodes[j].Pos > p+1 {
-					b.BBCodes[j].Pos += len(string(r))/2 - 1
-				}
-			}
-		}
-	}
+	// for p, r := range b.NewString {
+	// 	if len(string(r)) > 1 {
+	// 		for j := range b.BBCodes {
+	// 			// fmt.Println(b.BBCodes[j].Pos >= p+1, b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1)
+	// 			if b.BBCodes[j].Pos >= p+1 && b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1 {
+	// 				// fmt.Println("aaasjdaljsdlajslaj", spew.Sdump(b.BBCodes[j]), p)
+	// 				b.BBCodes[j].Len += len(string(r))/2 - 1
+	// 			}
+	// 			if b.BBCodes[j].Pos > p+1 {
+	// 				b.BBCodes[j].Pos += len(string(r))/2 - 1
+	// 			}
+	// 		}
+	// 	}
+	// }
 	return
 }
 
@@ -236,4 +250,31 @@ func (b *BBCodes) MakeURLs() {
 			b.BBCodes = append(b.BBCodes, bopen, bclose)
 		}
 	}
+}
+
+func getRunesRange(s string, start, end int) (r string, l int) {
+	var ra []rune
+	rs := []rune(s)
+	for i := range rs {
+		if i >= start && i < end {
+			ra = append(ra, rs[i])
+		}
+	}
+	grs := uniseg.NewGraphemes(string(ra))
+	for grs.Next() {
+		l++
+	}
+	return string(ra), l
+}
+
+func getGraphemesLen(s string) (l int) {
+	grs := uniseg.NewGraphemes(s)
+	for grs.Next() {
+		l++
+	}
+	return
+}
+
+func getRunesLen(s string) (l int) {
+	return len([]rune(s))
 }
