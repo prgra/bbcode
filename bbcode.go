@@ -51,9 +51,7 @@ func Parse(s string) (b BBCodes) {
 	start := false
 	b.Original = s
 	rs := []rune(s)
-	jspos := 0
 	for i = range rs {
-		jspos += UTF16Count(string(rs[i]))
 		tag.CloseFor = -1
 		tag.OpenFor = -1
 		if string(rs[i]) == "[" {
