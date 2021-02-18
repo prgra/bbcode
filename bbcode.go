@@ -51,7 +51,9 @@ func Parse(s string) (b BBCodes) {
 	start := false
 	b.Original = s
 	rs := []rune(s)
+	jspos := 0
 	for i = range rs {
+		jspos += UTF16Count(string(rs[i]))
 		tag.CloseFor = -1
 		tag.OpenFor = -1
 		if string(rs[i]) == "[" {
@@ -160,34 +162,35 @@ func Parse(s string) (b BBCodes) {
 			b.NewString = cutString(b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
 		}
 	}
-	//Shift Positions with utf8 Graphemes
+
+	for i = 0; i < len(b.BBCodes); i++ {
+		if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
+			p := b.BBCodes[i].OpenFor
+			if p < len(b.BBCodes) && p >= 0 {
+				b.BBCodes[i].Len = b.BBCodes[p].Pos - b.BBCodes[i].Pos
+			}
+		}
+	}
+
+	for p, r := range b.NewString {
+		if len(string(r)) > 1 {
+			for j := range b.BBCodes {
+				// fmt.Println(b.BBCodes[j].Pos >= p+1, b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1)
+				if b.BBCodes[j].Pos >= p+1 && b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1 {
+					// fmt.Println("aaasjdaljsdlajslaj", spew.Sdump(b.BBCodes[j]), p)
+					b.BBCodes[j].Len += len(string(r))/2 - 1
+				}
+				if b.BBCodes[j].Pos > p+1 {
+					b.BBCodes[j].Pos += len(string(r))/2 - 1
+				}
+			}
+		}
+	}
 
 	for i := range b.BBCodes {
 		b.BBCodes[i].Len = UTF16Count(b.BBCodes[i].Text)
 	}
-	// for i = 0; i < len(b.BBCodes); i++ {
-	// 	if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
-	// 		p := b.BBCodes[i].OpenFor
-	// 		if p < len(b.BBCodes) && p >= 0 {
-	// 			b.BBCodes[i].Len = b.BBCodes[p].Pos - b.BBCodes[i].Pos
-	// 		}
-	// 	}
-	// }
 
-	// for p, r := range b.NewString {
-	// 	if len(string(r)) > 1 {
-	// 		for j := range b.BBCodes {
-	// 			// fmt.Println(b.BBCodes[j].Pos >= p+1, b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1)
-	// 			if b.BBCodes[j].Pos >= p+1 && b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1 {
-	// 				// fmt.Println("aaasjdaljsdlajslaj", spew.Sdump(b.BBCodes[j]), p)
-	// 				b.BBCodes[j].Len += len(string(r))/2 - 1
-	// 			}
-	// 			if b.BBCodes[j].Pos > p+1 {
-	// 				b.BBCodes[j].Pos += len(string(r))/2 - 1
-	// 			}
-	// 		}
-	// 	}
-	// }
 	return
 }
 
@@ -262,6 +265,7 @@ func getRunesLen(s string) (l int) {
 	return len([]rune(s))
 }
 
+// UTF16Count get len of string like javascript
 func UTF16Count(s string) (c int) {
 	rs := []rune(s)
 	for i := range rs {

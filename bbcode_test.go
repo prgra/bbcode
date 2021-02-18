@@ -67,10 +67,10 @@ func TestPositions(t *testing.T) {
 		t.Errorf("TestPositions new string: got:  %s\nneed: 👩test \nDebug info: \n%v", s.NewString, spew.Sdump(s))
 	}
 	if s.BBCodes[0].Len != 6 {
-		t.Errorf("TestPositions error: got:  %d\nneed: 5\nDebug info: \n%v", s.BBCodes[0].Len, spew.Sdump(s))
+		t.Errorf("TestPositions error: got:  %d\nneed: 6\nDebug info: \n%v", s.BBCodes[0].Len, spew.Sdump(s))
 	}
-	if s.BBCodes[1].Pos != 6 {
-		t.Errorf("TestPositions error: got:  %d\nneed: 4\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
+	if s.BBCodes[1].Pos != 7 {
+		t.Errorf("TestPositions error: got:  %d\nneed: 7\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
 	}
 }
 
