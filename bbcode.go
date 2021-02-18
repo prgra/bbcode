@@ -2,8 +2,7 @@ package bbcode
 
 import (
 	"strings"
-
-	"github.com/rivo/uniseg"
+	"unicode/utf8"
 )
 
 // BBCodes List of codes result for Parse function
@@ -163,12 +162,8 @@ func Parse(s string) (b BBCodes) {
 	}
 	//Shift Positions with utf8 Graphemes
 
-	sft := 0
 	for i := range b.BBCodes {
-		b.BBCodes[i].Pos -= sft
-		if !b.BBCodes[i].IsClose {
-			sft += getRunesLen(b.BBCodes[i].Text) - getGraphemesLen(b.BBCodes[i].Text)
-		}
+		b.BBCodes[i].Len = UTF16Count(b.BBCodes[i].Text)
 	}
 	// for i = 0; i < len(b.BBCodes); i++ {
 	// 	if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
@@ -252,7 +247,7 @@ func (b *BBCodes) MakeURLs() {
 	}
 }
 
-func getRunesRange(s string, start, end int) (r string, l int) {
+func getRunesRange(s string, start, end int) (string, int) {
 	var ra []rune
 	rs := []rune(s)
 	for i := range rs {
@@ -260,21 +255,21 @@ func getRunesRange(s string, start, end int) (r string, l int) {
 			ra = append(ra, rs[i])
 		}
 	}
-	grs := uniseg.NewGraphemes(string(ra))
-	for grs.Next() {
-		l++
-	}
-	return string(ra), l
-}
-
-func getGraphemesLen(s string) (l int) {
-	grs := uniseg.NewGraphemes(s)
-	for grs.Next() {
-		l++
-	}
-	return
+	return string(ra), UTF16Count(s)
 }
 
 func getRunesLen(s string) (l int) {
 	return len([]rune(s))
+}
+
+func UTF16Count(s string) (c int) {
+	rs := []rune(s)
+	for i := range rs {
+		if utf8.RuneLen(rs[i]) == 1 {
+			c++
+			continue
+		}
+		c += utf8.RuneLen(rs[i]) / 2
+	}
+	return c
 }
