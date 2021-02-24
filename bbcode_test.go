@@ -149,3 +149,11 @@ func TestRuneLens(t *testing.T) {
 		}
 	}
 }
+
+func TestLenNestedCodes(t *testing.T) {
+	txt := "[b][color=green]green[/color] black [color=green]green[/color][color=#4372F7]0.00 mBT[/color][color=#FF4848] test [/color] bold too[/b]"
+	bb := Parse(txt)
+	if bb.BBCodes[0].Len != 40 {
+		t.Errorf("TestLenNestedCodes need 40, got %d", bb.BBCodes[0].Len)
+	}
+}

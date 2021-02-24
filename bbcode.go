@@ -186,7 +186,9 @@ func Parse(s string) (b BBCodes) {
 	}
 
 	for i := range b.BBCodes {
-		b.BBCodes[i].Len = UTF16Count(b.BBCodes[i].Text)
+		if b.BBCodes[i].Text != "" {
+			b.BBCodes[i].Len = UTF16Count(b.BBCodes[i].Text)
+		}
 	}
 
 	return
