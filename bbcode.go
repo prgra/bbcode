@@ -151,7 +151,7 @@ func Parse(s string) (b BBCodes) {
 
 	// Make new string, cut untervals and shift positions
 	b.NewString = b.Original
-	for i = 0; i < len(b.BBCodes); i++ {
+	for i := range b.BBCodes {
 		if b.BBCodes[i].IsValid {
 			l := b.BBCodes[i].OriginalEnd - b.BBCodes[i].OriginalStart
 			for j = i + 1; j < len(b.BBCodes); j++ {
@@ -160,34 +160,14 @@ func Parse(s string) (b BBCodes) {
 			b.NewString = cutString(b.NewString, b.BBCodes[i].Pos, b.BBCodes[i].Pos+l)
 		}
 	}
-
-	for i = 0; i < len(b.BBCodes); i++ {
+	ra := []rune(b.NewString)
+	for i := range b.BBCodes {
 		if b.BBCodes[i].IsValid && !b.BBCodes[i].IsClose {
 			p := b.BBCodes[i].OpenFor
 			if p < len(b.BBCodes) && p >= 0 {
-				b.BBCodes[i].Len = b.BBCodes[p].Pos - b.BBCodes[i].Pos
+				b.BBCodes[i].Len = UTF16Count(string(ra[b.BBCodes[i].Pos-1 : b.BBCodes[p].Pos-1]))
+				b.BBCodes[i].Text = string(ra[b.BBCodes[i].Pos-1 : b.BBCodes[p].Pos-1])
 			}
-		}
-	}
-
-	for p, r := range b.NewString {
-		if len(string(r)) > 1 {
-			for j := range b.BBCodes {
-				// fmt.Println(b.BBCodes[j].Pos >= p+1, b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1)
-				if b.BBCodes[j].Pos >= p+1 && b.BBCodes[j].Pos+b.BBCodes[j].Len >= p+1 {
-					// fmt.Println("aaasjdaljsdlajslaj", spew.Sdump(b.BBCodes[j]), p)
-					b.BBCodes[j].Len += len(string(r))/2 - 1
-				}
-				if b.BBCodes[j].Pos > p+1 {
-					b.BBCodes[j].Pos += len(string(r))/2 - 1
-				}
-			}
-		}
-	}
-
-	for i := range b.BBCodes {
-		if b.BBCodes[i].Text != "" {
-			b.BBCodes[i].Len = UTF16Count(b.BBCodes[i].Text)
 		}
 	}
 

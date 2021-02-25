@@ -69,8 +69,8 @@ func TestPositions(t *testing.T) {
 	if s.BBCodes[0].Len != 6 {
 		t.Errorf("TestPositions error: got:  %d\nneed: 6\nDebug info: \n%v", s.BBCodes[0].Len, spew.Sdump(s))
 	}
-	if s.BBCodes[1].Pos != 7 {
-		t.Errorf("TestPositions error: got:  %d\nneed: 7\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
+	if s.BBCodes[1].Pos != 6 {
+		t.Errorf("TestPositions error: got:  %d\nneed: 6\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
 	}
 }
 
@@ -119,7 +119,7 @@ func TestUtfLens(t *testing.T) {
 	bb := Parse(str)
 	if bb.BBCodes[0].Len != 3 {
 		spew.Dump(bb)
-		t.Errorf("wrong Len 0: need 1, got '%d'", bb.BBCodes[0].Len)
+		t.Errorf("wrong Len 0: need 3, got '%d'", bb.BBCodes[0].Len)
 	}
 	if bb.BBCodes[0].Pos != 12 {
 		spew.Dump(bb)
@@ -133,6 +133,8 @@ func TestUtfLens(t *testing.T) {
 		spew.Dump(bb)
 		t.Errorf("wrong Pos 3: need 18, got '%d'", bb.BBCodes[3].Pos)
 	}
+	// spew.Dump(bb)
+	// t.Fail()
 }
 
 func TestRuneLens(t *testing.T) {
@@ -155,5 +157,9 @@ func TestLenNestedCodes(t *testing.T) {
 	bb := Parse(txt)
 	if bb.BBCodes[0].Len != 40 {
 		t.Errorf("TestLenNestedCodes need 40, got %d", bb.BBCodes[0].Len)
+	}
+	bb = Parse("[color=green]green[b]greenbold[/b][/color]")
+	if bb.BBCodes[0].Len != 14 {
+		t.Errorf("TestLenNestedCodes need 14, got %d", bb.BBCodes[0].Len)
 	}
 }
