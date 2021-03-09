@@ -125,9 +125,9 @@ func TestUtfLens(t *testing.T) {
 		spew.Dump(bb)
 		t.Errorf("wrong Pos 0: need 12, got '%d'", bb.BBCodes[0].Len)
 	}
-	if bb.BBCodes[2].Pos != 15 {
+	if bb.BBCodes[2].Pos != 16 {
 		spew.Dump(bb)
-		t.Errorf("wrong Pos 2: need 14, got '%d'", bb.BBCodes[2].Pos)
+		t.Errorf("wrong Pos 2: need 16, got '%d'", bb.BBCodes[2].Pos)
 	}
 	if bb.BBCodes[3].Pos != 19 {
 		spew.Dump(bb)
@@ -143,6 +143,7 @@ func TestRuneLens(t *testing.T) {
 		"🔆️":      3,
 		"👍":       2,
 		"👩‍👩‍👦‍👦": 11,
+		"🦒":       2,
 	}
 	for k, v := range chars {
 		c := UTF16Count(k)
@@ -161,5 +162,11 @@ func TestLenNestedCodes(t *testing.T) {
 	bb = Parse("[color=green]green[b]greenbold[/b][/color]")
 	if bb.BBCodes[0].Len != 14 {
 		t.Errorf("TestLenNestedCodes need 14, got %d", bb.BBCodes[0].Len)
+	}
+}
+func TestUtfLen2(t *testing.T) {
+	bb := Parse("[b]🚧🛠test[/b]🚧🛠[b]vrfy[/b]")
+	if bb.BBCodes[2].Pos != 13 {
+		t.Errorf("TestUtfLen2 wrong position need 13, got %d", bb.BBCodes[2].Pos)
 	}
 }

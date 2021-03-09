@@ -169,6 +169,8 @@ func Parse(s string) (b BBCodes) {
 				b.BBCodes[i].Text = string(ra[b.BBCodes[i].Pos-1 : b.BBCodes[p].Pos-1])
 			}
 		}
+		// fmt.Printf("%d->%d '%s'   \n", b.BBCodes[i].Pos, UTF16Count(string(ra[0:b.BBCodes[i].Pos-1])), string(ra[0:b.BBCodes[i].Pos]))
+		b.BBCodes[i].Pos = UTF16Count(string(ra[0:b.BBCodes[i].Pos-1])) + 1
 	}
 
 	return
