@@ -69,8 +69,8 @@ func TestPositions(t *testing.T) {
 	if s.BBCodes[0].Len != 6 {
 		t.Errorf("TestPositions error: got:  %d\nneed: 6\nDebug info: \n%v", s.BBCodes[0].Len, spew.Sdump(s))
 	}
-	if s.BBCodes[1].Pos != 6 {
-		t.Errorf("TestPositions error: got:  %d\nneed: 6\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
+	if s.BBCodes[1].Pos != 7 {
+		t.Errorf("TestPositions error: got:  %d\nneed: 7\nDebug info: \n%v", s.BBCodes[1].Pos, spew.Sdump(s))
 	}
 }
 
@@ -129,9 +129,9 @@ func TestUtfLens(t *testing.T) {
 		spew.Dump(bb)
 		t.Errorf("wrong Pos 2: need 16, got '%d'", bb.BBCodes[2].Pos)
 	}
-	if bb.BBCodes[3].Pos != 19 {
+	if bb.BBCodes[3].Pos != 20 {
 		spew.Dump(bb)
-		t.Errorf("wrong Pos 3: need 18, got '%d'", bb.BBCodes[3].Pos)
+		t.Errorf("wrong Pos 3: need 20, got '%d'", bb.BBCodes[3].Pos)
 	}
 	// spew.Dump(bb)
 	// t.Fail()
