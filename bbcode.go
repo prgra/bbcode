@@ -176,13 +176,14 @@ func Parse(s string) (b BBCodes) {
 	return
 }
 
-func cutString(s string, f int, t int) (res string) {
+func cutString(s string, f int, t int) string {
+	var sb strings.Builder
 	for i, r := range []rune(s) {
 		if i+1 < f || i+1 > t {
-			res += string(r)
+			sb.WriteString(string(r))
 		}
 	}
-	return
+	return sb.String()
 }
 
 // MakeURLs make url tags from text
