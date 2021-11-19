@@ -1,7 +1,7 @@
 package main
 
 import (
-	"git.insystem.su/prgr/bbcode"
+	"github.com/prgra/bbcode"
 	"github.com/davecgh/go-spew/spew"
 )
 
