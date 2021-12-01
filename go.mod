@@ -1,4 +1,4 @@
-module git.insystem.su/prgr/bbcode
+module github.com/prgra/bbcode
 
 go 1.15
 
